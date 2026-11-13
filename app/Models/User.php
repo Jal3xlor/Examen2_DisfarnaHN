@@ -10,7 +10,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
+//solo para aclarar esto lo dio por defecto solo lo adapte a como lo ocupo, segun investigue es porque tengo laravel 13
+#[Fillable(['name', 'email', 'password', 'rol', 'cambiar_password'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -27,6 +28,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'cambiar_password' => 'boolean',
         ];
     }
 }
