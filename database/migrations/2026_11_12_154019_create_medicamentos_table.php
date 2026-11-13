@@ -20,7 +20,7 @@ return new class extends Migration
             $table->decimal('costo',10,2);
             $table->integer('inventario');
             $table->string('imagen')->nullable();
-            $table->string('Laboratorio');
+            $table->string('laboratorio');
             $table->date('fecha_vencimiento');
             $table->date('fecha_registro');
             $table->string('numero_lote');

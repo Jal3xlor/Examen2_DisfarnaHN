@@ -5,6 +5,9 @@ use App\Http\Controllers\MedicamentosController;
 use App\Http\Controllers\ProveedorController;
 use App\Http\Controllers\EmpleadoController;
 use App\Http\Controllers\AuthController;
+use App\Models\Medicamentos;
+use App\Models\Proveedores;
+use App\Models\Empleado;
 use Illuminate\Support\Facades\Auth;
 
 // RUTAS PÚBLICAS
@@ -30,7 +33,17 @@ Route::middleware('auth')->group(function () {
         if (Auth::user()->cambiar_password) {
             return redirect()->route('password.change');
         }
-        return view('dashboard');
+        $totalMedicamentos = Medicamentos::count();
+        $proveedoresActivos = Proveedores::where('estado', 'Activo')->count();
+        $totalEmpleados = Empleado::where('estado', 'Activo')->count();
+        $valorInventario = Medicamentos::selectRaw('COALESCE(SUM(inventario * precio), 0) as total')
+            ->value('total');
+        return view('dashboard', compact(
+            'totalMedicamentos',
+            'proveedoresActivos',
+            'totalEmpleados',
+            'valorInventario'
+        ));
     })->name('dashboard');
 
     //los modulos
