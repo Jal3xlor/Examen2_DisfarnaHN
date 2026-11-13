@@ -7,13 +7,13 @@ use Illuminate\Http\Request;
 
 class MedicamentosController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    // Mostrar medicamentos y realizar búsquedas
+    public function index(Request $request)
     {
-        $medicamentos = Medicamentos::where('nombre', 'like', '%' . $request->buscar . '%')
-            ->orWhere('codigo', 'like', '%' . $request->buscar . '%')
+        $buscar = $request->buscar;
+
+        $medicamentos = Medicamentos::where('nombre', 'like', '%' . $buscar . '%')
+            ->orWhere('codigo', 'like', '%' . $buscar . '%')
             ->latest()
             ->paginate(10)
             ->withQueryString();
@@ -21,31 +21,27 @@ class MedicamentosController extends Controller
         return view('medicamentos.index', compact('medicamentos'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    // Mostrar formulario de registro
     public function create()
     {
         return view('medicamentos.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // Registrar medicamento
     public function store(Request $request)
     {
         $datos = $request->validate([
-            'codigo'=>'required|string|max:255|unique:medicamentos,codigo',
-            'nombre'=>'required|string|max:255',
-            'categoria'=>'required|in:Antibióticos,Analgésicos,Sueros,Material Quirúrgico,Vitaminas',
-            'precio'=>'required|numeric|min:0.01',
-            'costo'=>'required|numeric|min:0',
-            'inventario'=>'required|integer|min:0',
-            'imagen'=>'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
-            'laboratorio'=>'required|string|max:255',
-            'fecha_vencimiento'=>'required|date',
-            'fecha_registro'=>'required|date',
-            'numero_lote'=>'required|string|max:255',
+            'codigo' => 'required|string|max:255|unique:medicamentos,codigo',
+            'nombre' => 'required|string|max:255',
+            'categoria' => 'required|in:Antibióticos,Analgésicos,Sueros,Material Quirúrgico,Vitaminas',
+            'precio' => 'required|numeric|min:0.01',
+            'costo' => 'required|numeric|min:0',
+            'inventario' => 'required|integer|min:0',
+            'imagen' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'laboratorio' => 'required|string|max:255',
+            'fecha_vencimiento' => 'required|date',
+            'fecha_registro' => 'required|date',
+            'numero_lote' => 'required|string|max:255',
         ]);
 
         if ($request->hasFile('imagen')) {
@@ -68,26 +64,20 @@ class MedicamentosController extends Controller
                          ->with('success', '¡Medicamento registrado exitosamente!');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Medicamentos $medicamentos)
+    // Mostrar medicamento seleccionado
+    public function show(Medicamentos $medicamento)
     {
         return redirect()->route('medicamentos.edit', $medicamento);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Medicamentos $medicamentos)
+    // Mostrar formulario de edición
+    public function edit(Medicamentos $medicamento)
     {
         return view('medicamentos.edit', compact('medicamento'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Medicamentos $medicamentos)
+    // Actualizar medicamento
+    public function update(Request $request, Medicamentos $medicamento)
     {
         $datos = $request->validate([
             'codigo' => 'required|string|max:255|unique:medicamentos,codigo,' . $medicamento->id,
@@ -129,10 +119,8 @@ class MedicamentosController extends Controller
                          ->with('success', '¡Medicamento actualizado correctamente!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Medicamentos $medicamentos)
+    // Eliminar medicamento
+    public function destroy(Medicamentos $medicamento)
     {
         if ($medicamento->imagen && file_exists(public_path($medicamento->imagen))) {
             unlink(public_path($medicamento->imagen));
@@ -144,3 +132,4 @@ class MedicamentosController extends Controller
                          ->with('success', '¡Medicamento eliminado correctamente!');
     }
 }
+

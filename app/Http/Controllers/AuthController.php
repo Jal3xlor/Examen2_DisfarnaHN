@@ -53,6 +53,10 @@ class AuthController extends Controller
     //cambiar la contraseña para usuarios nuevos pero mostrar el panel
     public function showChangePassword()
     {
+        if (!Auth::user()->cambiar_password) {
+            return redirect()->route('dashboard');
+        }
+
         return view('auth.change-password');
     }
 

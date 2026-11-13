@@ -7,35 +7,40 @@ use Illuminate\Http\Request;
 
 class EmpleadoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    // Mostrar empleados y realizar búsquedas
+    public function index(Request $request)
     {
-       $empleados = Empleado::latest()->paginate(10);
+        $buscar = $request->buscar;
+
+        $empleados = Empleado::where('identidad', 'like', '%' . $buscar . '%')
+            ->orWhere('nombre', 'like', '%' . $buscar . '%')
+            ->orWhere('apellido', 'like', '%' . $buscar . '%')
+            ->orWhere('correo', 'like', '%' . $buscar . '%')
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
         return view('empleados.index', compact('empleados'));
     }
 
-    
+    // Mostrar formulario de registro
     public function create()
     {
-       return view('empleados.create');
+        return view('empleados.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // Registrar empleado
     public function store(Request $request)
     {
         $datos = $request->validate([
-            'identidad'=>'required|digits:13|unique:empleados,identidad',
-            'nombre'=>'required|string|max:255',
-            'apellido'=>'required|string|max:255',
-            'correo'=>'required|email|unique:empleados,correo',
-            'cargo'=>'required|in:Regente Farmacéutico,Asistente de Farmacia,Jefe de Bodega,Despachador,Cajero',
-            'salario'=>'required|numeric|min:0',
-            'fecha_ingreso'=>'required|date',
-            'estado'=>'required|in:Activo,Inactivo',
+            'identidad' => 'required|digits:13|unique:empleados,identidad',
+            'nombre' => 'required|string|max:255',
+            'apellido' => 'required|string|max:255',
+            'correo' => 'required|email|unique:empleados,correo',
+            'cargo' => 'required|in:Regente Farmacéutico,Asistente de Farmacia,Jefe de Bodega,Despachador,Cajero',
+            'salario' => 'required|numeric|min:0.01',
+            'fecha_ingreso' => 'required|date',
+            'estado' => 'required|in:Activo,Inactivo',
         ]);
 
         Empleado::create($datos);
@@ -44,36 +49,30 @@ class EmpleadoController extends Controller
                          ->with('success', '¡Empleado registrado exitosamente!');
     }
 
-    /**
-     * Display the specified resource.
-     */
+    // Mostrar empleado seleccionado
     public function show(Empleado $empleado)
     {
         return redirect()->route('empleados.edit', $empleado);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+    // Mostrar formulario de edición
     public function edit(Empleado $empleado)
     {
         return view('empleados.edit', compact('empleado'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    // Actualizar empleado
     public function update(Request $request, Empleado $empleado)
     {
         $datos = $request->validate([
-            'identidad'=>'required|digits:13|unique:empleados,identidad,' . $empleado->id,
-            'nombre'=>'required|string|max:255',
-            'apellido'=>'required|string|max:255',
-            'correo'=>'required|email|unique:empleados,correo,' . $empleado->id,
-            'cargo'=>'required|in:Regente Farmacéutico,Asistente de Farmacia,Jefe de Bodega,Despachador,Cajero',
-            'salario'=>'required|numeric|min:0',
-            'fecha_ingreso'=>'required|date',
-            'estado'=>'required|in:Activo,Inactivo',
+            'identidad' => 'required|digits:13|unique:empleados,identidad,' . $empleado->id,
+            'nombre' => 'required|string|max:255',
+            'apellido' => 'required|string|max:255',
+            'correo' => 'required|email|unique:empleados,correo,' . $empleado->id,
+            'cargo' => 'required|in:Regente Farmacéutico,Asistente de Farmacia,Jefe de Bodega,Despachador,Cajero',
+            'salario' => 'required|numeric|min:0.01',
+            'fecha_ingreso' => 'required|date',
+            'estado' => 'required|in:Activo,Inactivo',
         ]);
 
         $empleado->update($datos);
@@ -82,9 +81,7 @@ class EmpleadoController extends Controller
                          ->with('success', '¡Empleado actualizado correctamente!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    // Eliminar empleado
     public function destroy(Empleado $empleado)
     {
         $empleado->delete();

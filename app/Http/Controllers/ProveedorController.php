@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Proveedor;
+use App\Models\Proveedores;
 use Illuminate\Http\Request;
 
 class ProveedorController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    // Mostrar proveedores y realizar búsquedas
+    public function index(Request $request)
     {
-        $proveedores = Proveedores::where('empresa', 'like', '%' . $request->buscar . '%')
-            ->orWhere('rtn', 'like', '%' . $request->buscar . '%')
+        $buscar = $request->buscar;
+
+        $proveedores = Proveedores::where('empresa', 'like', '%' . $buscar . '%')
+            ->orWhere('rtn', 'like', '%' . $buscar . '%')
             ->latest()
             ->paginate(10)
             ->withQueryString();
@@ -21,17 +21,13 @@ class ProveedorController extends Controller
         return view('proveedores.index', compact('proveedores'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    // Mostrar formulario de registro
     public function create()
     {
-         return view('proveedores.create');
+        return view('proveedores.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // Registrar proveedor
     public function store(Request $request)
     {
         $datos = $request->validate([
@@ -52,26 +48,20 @@ class ProveedorController extends Controller
                          ->with('success', '¡Proveedor registrado exitosamente!');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Proveedor $proveedor)
+    // Mostrar proveedor seleccionado
+    public function show(Proveedores $proveedor)
     {
         return redirect()->route('proveedores.edit', $proveedor);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Proveedor $proveedor)
+    // Mostrar formulario de edición
+    public function edit(Proveedores $proveedor)
     {
         return view('proveedores.edit', compact('proveedor'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Proveedor $proveedor)
+    // Actualizar proveedor
+    public function update(Request $request, Proveedores $proveedor)
     {
         $datos = $request->validate([
             'rtn' => 'required|digits:14|unique:proveedores,rtn,' . $proveedor->id,
@@ -91,10 +81,8 @@ class ProveedorController extends Controller
                          ->with('success', '¡Proveedor actualizado correctamente!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Proveedor $proveedor)
+    // Eliminar proveedor
+    public function destroy(Proveedores $proveedor)
     {
         $proveedor->delete();
 
@@ -102,3 +90,4 @@ class ProveedorController extends Controller
                          ->with('success', '¡Proveedor eliminado correctamente!');
     }
 }
+
